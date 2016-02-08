@@ -1,0 +1,41 @@
+;; log_download.ttl
+;; 
+;; TeraTermマクロ
+;;  コマンド実行後、scpでファイルをダウンロード。
+
+;; Setting
+HOSTADDR = '127.0.0.1'
+USERNAME = 'username' 
+PASSWORD = 'password' 
+LOCALPATH = 'c:\work\'
+SERVERPATH = '/tmp/logs.tar.gz'
+SCRIPTPATH = '/tmp/log_collect.sh'
+
+;; Connect
+COMMAND = HOSTADDR
+strconcat COMMAND ':3366 /ssh /2 /auth=password /user='
+strconcat COMMAND USERNAME
+strconcat COMMAND ' /passwd='
+strconcat COMMAND PASSWORD
+connect COMMAND
+
+;; Exec Shell Script
+wait '#' '$'
+sendln
+EXECSCRIPT = 'sh '
+strconcat EXECSCRIPT SCRIPTPATH
+sendln EXECSCRIPT
+
+;; Create FileName
+getdate NOWDATE "%Y%m%d_%H%M_"
+strconcat LOCALPATH NOWDATE
+strconcat LOCALPATH "logs.tar.gz"
+
+;; Scp File Download
+wait '#' '$'
+sendln
+scprecv SERVERPATH LOCALPATH
+mpause 1000
+sendln 'exit'
+
+end
